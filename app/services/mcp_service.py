@@ -1,11 +1,12 @@
 from fastmcp import Client
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional, Tuple, Union
 import json
 import os
 import tempfile
 import logging
 from fastapi import Depends
-from fastmcp.client import SSETransport, StdioTransport
+from fastmcp.client import SSETransport, StdioTransport, StreamableHttpTransport
+from fastmcp.client.transports import StdioTransport, SSETransport, StreamableHttpTransport, ClientTransport
 
 # 配置日志
 logger = logging.getLogger("app.services.mcp")
@@ -35,20 +36,39 @@ class MCPService:
             logger.error(f"获取MCP工具时出错: {str(e)}", exc_info=True)
             return []
     
-    def _create_mcp_client(self, server_config: Dict[str, Any]) -> Optional[Client]:
+    def _create_transport(self, server_config: Dict[str, Any]) -> Optional[ClientTransport]:
         """
-        根据服务器配置创建MCP客户端
+        根据服务器配置创建MCP传输对象
         
         Args:
             server_config: 服务器配置字典
             
         Returns:
-            创建的MCP客户端，如果创建失败则返回None
+            创建的MCP传输对象，如果创建失败则返回None
         """
         try:
             if "url" in server_config:
-                # HTTP服务器
-                return Client(SSETransport(server_config["url"]))
+                # 确定传输类型，默认为SSE
+                transport_type = server_config.get("transport_type", "sse").lower()
+                url = server_config["url"]
+                headers = server_config.get("headers", {})
+                
+                logger.info(f"创建传输对象，类型: {transport_type}, URL: {url}")
+                
+                if transport_type == "streamable-http":
+                    # 使用Streamable HTTP传输
+                    # 确保URL格式正确，不需要额外添加参数
+                    # 注意: StreamableHttpTransport和SSETransport需要不同的URL格式
+                    logger.info(f"创建Streamable HTTP传输: URL={url}")
+                    transport = StreamableHttpTransport(url=url, headers=headers)
+                    logger.info(f"Streamable HTTP传输创建成功")
+                    return transport
+                else:
+                    # 默认使用SSE传输
+                    logger.info(f"创建SSE传输: URL={url}")
+                    transport = SSETransport(url=url, headers=headers)
+                    logger.info(f"SSE传输创建成功")
+                    return transport
             elif "command" in server_config:
                 # 命令行服务器
                 command = server_config["command"]
@@ -59,24 +79,25 @@ class MCPService:
                 if "env" in server_config:
                     env.update(server_config["env"])
                 
-                return Client(StdioTransport(command=command, args=args, env=env))
+                logger.info(f"创建Stdio传输，命令: {command}")
+                return StdioTransport(command=command, args=args, env=env)
             else:
                 logger.error("无效的服务器配置: 缺少url或command字段")
                 return None
         except Exception as e:
-            logger.error(f"创建MCP客户端时出错: {str(e)}", exc_info=True)
+            logger.error(f"创建MCP传输对象时出错: {str(e)}", exc_info=True)
             return None
     
-    async def _create_temp_config_and_client(self, server_name: str, server_config: Dict[str, Any]) -> Tuple[Optional[Client], Optional[str]]:
+    async def _create_temp_config_and_transport(self, server_name: str, server_config: Dict[str, Any]) -> Tuple[Optional[ClientTransport], Optional[str]]:
         """
-        创建临时配置文件和MCP客户端
+        创建临时配置文件和MCP传输对象
         
         Args:
             server_name: 服务器名称
             server_config: 服务器配置
             
         Returns:
-            包含客户端和临时文件路径的元组 (client, temp_file_path)
+            包含传输对象和临时文件路径的元组 (transport, temp_file_path)
         """
         # 创建临时配置文件
         temp_file_path = None
@@ -85,9 +106,9 @@ class MCPService:
                 temp_file_path = temp_file.name
                 json.dump({server_name: server_config}, temp_file)
             
-            # 创建客户端
-            client = self._create_mcp_client(server_config)
-            return client, temp_file_path
+            # 创建传输对象
+            transport = self._create_transport(server_config)
+            return transport, temp_file_path
             
         except Exception as e:
             # 如果创建过程中出现错误，尝试清理临时文件
@@ -96,7 +117,7 @@ class MCPService:
                     os.unlink(temp_file_path)
                 except:
                     pass
-            logger.error(f"创建临时配置和客户端时出错: {str(e)}", exc_info=True)
+            logger.error(f"创建临时配置和传输对象时出错: {str(e)}", exc_info=True)
             return None, temp_file_path
             
     async def _get_tools_from_external_servers(self, config: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -109,11 +130,12 @@ class MCPService:
             try:
                 logger.info(f"尝试连接外部MCP服务器: {server_name}")
                 
-                # 创建客户端和临时配置
-                client, temp_file_path = await self._create_temp_config_and_client(server_name, server_config)
+                # 创建传输对象和临时配置
+                transport, temp_file_path = await self._create_temp_config_and_transport(server_name, server_config)
                 
-                if client:
-                    async with client:
+                if transport:
+                    # 仅在需要时创建客户端
+                    async with Client(transport) as client:
                         # 获取工具列表
                         tools = await client.list_tools()
                         
@@ -186,10 +208,12 @@ class MCPService:
             try:
                 logger.info(f"尝试在服务器 {server_name} 上执行工具 {tool_name}, 参数: {arguments}")
                 
-                # 创建客户端和临时配置
-                client, temp_file_path = await self._create_temp_config_and_client(server_name, server_config)
+                # 创建传输对象和临时配置
+                transport, temp_file_path = await self._create_temp_config_and_transport(server_name, server_config)
                 
-                if client:
+                if transport:
+                    # 仅在需要时创建客户端
+                    client = Client(transport)
                     async with client:
                         # 检查工具是否可用
                         tools = await client.list_tools()

@@ -65,9 +65,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const formatted = JSON.stringify(parsed, null, 2);
             simpleJsonEditor.value = formatted;
             mcpConfigTextarea.value = formatted;
-            addSystemMessage('✅ JSON已格式化');
+
+            // 获取设置面板作为消息容器
+            const settingsPanel = document.getElementById('settings-panel');
+            const messageContainer = settingsPanel.querySelector('.settings-container');
+
+            // 在设置面板中显示成功消息
+            addSystemMessage('✅ JSON已格式化', false, messageContainer);
         } catch (e) {
-            addSystemMessage('⚠️ JSON格式错误，无法格式化', true);
+            // 获取设置面板作为消息容器
+            const settingsPanel = document.getElementById('settings-panel');
+            const messageContainer = settingsPanel.querySelector('.settings-container');
+
+            // 在设置面板中显示错误消息
+            addSystemMessage('⚠️ JSON格式错误，无法格式化', true, messageContainer);
             console.error('格式化JSON出错:', e);
         }
     }
@@ -77,7 +88,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const defaultConfig = JSON.stringify(defaultMcpConfig, null, 2);
         simpleJsonEditor.value = defaultConfig;
         mcpConfigTextarea.value = defaultConfig;
-        addSystemMessage('✅ 已恢复默认MCP配置');
+
+        // 获取设置面板作为消息容器
+        const settingsPanel = document.getElementById('settings-panel');
+        const messageContainer = settingsPanel.querySelector('.settings-container');
+
+        // 在设置面板中显示成功消息
+        addSystemMessage('✅ 已恢复默认MCP配置', false, messageContainer);
     }
 
     // 保存设置
@@ -88,12 +105,24 @@ document.addEventListener('DOMContentLoaded', () => {
             JSON.parse(configValue);
             mcpConfigTextarea.value = configValue;
 
-            // 显示保存成功消息
-            addSystemMessage('✅ 设置已保存');
+            // 获取设置面板作为消息容器
+            const settingsPanel = document.getElementById('settings-panel');
+            const messageContainer = settingsPanel.querySelector('.settings-container');
+
+            // 在设置面板中显示成功消息
+            addSystemMessage('✅ 设置已保存', false, messageContainer);
+
             // 切换到聊天标签页
-            switchToTab('chat');
+            setTimeout(() => {
+                switchToTab('chat');
+            }, 1000); // 延迟切换，让用户看到保存成功的消息
         } catch (e) {
-            addSystemMessage('⚠️ MCP配置JSON格式错误，无法保存', true);
+            // 获取设置面板作为消息容器
+            const settingsPanel = document.getElementById('settings-panel');
+            const messageContainer = settingsPanel.querySelector('.settings-container');
+
+            // 在设置面板中显示错误消息
+            addSystemMessage('⚠️ MCP配置JSON格式错误，无法保存', true, messageContainer);
             console.error('保存设置时出错:', e);
         }
     }
@@ -164,26 +193,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 添加系统消息，不计入对话历史
-    function addSystemMessage(message, isError = false) {
+    function addSystemMessage(message, isError = false, container = null) {
+        // 确定要显示消息的容器
+        const targetContainer = container || chatMessages;
+
         const messageElement = document.createElement('div');
         messageElement.className = `message system-message ${isError ? 'error-message' : ''}`;
         messageElement.innerHTML = marked.parse(message);
-        chatMessages.appendChild(messageElement);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        targetContainer.appendChild(messageElement);
+        targetContainer.scrollTop = targetContainer.scrollHeight;
 
         // 设置自动消失
         if (!isError) {
             setTimeout(() => {
-                if (messageElement.parentNode === chatMessages) {
+                if (messageElement.parentNode === targetContainer) {
                     messageElement.style.opacity = '0';
                     setTimeout(() => {
-                        if (messageElement.parentNode === chatMessages) {
-                            chatMessages.removeChild(messageElement);
+                        if (messageElement.parentNode === targetContainer) {
+                            targetContainer.removeChild(messageElement);
                         }
                     }, 500);
                 }
             }, 3000);
         }
+
+        return messageElement;
     }
 
     // 流式处理函数

@@ -763,3 +763,25 @@ h1 {
     border-color: #3498db;
     box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
+
+/* 设置面板中的系统消息容器 */
+.settings-container .system-message {
+    position: relative;
+    margin: 12px 0;
+    padding: 10px 15px;
+    border-radius: 5px;
+    max-width: 100%;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.settings-container .error-message {
+    background-color: #fff8f8;
+    border-left: 3px solid #e74c3c;
+    color: #e74c3c;
+}
+
+.settings-container .system-message:not(.error-message) {
+    background-color: #f2f9f4;
+    border-left: 3px solid #28a745;
+    color: #28a745;
+}
