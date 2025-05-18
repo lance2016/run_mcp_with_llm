@@ -1,0 +1,765 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    flex-shrink: 0;
+}
+
+.chat-container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    min-height: 0;
+}
+
+.message {
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.user-message {
+    background-color: #3498db;
+    color: white;
+    margin-left: auto;
+}
+
+.bot-message {
+    background-color: #eee;
+    color: #333;
+    margin-right: auto;
+}
+
+.user-input {
+    display: flex;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #ddd;
+    flex-shrink: 0;
+}
+
+.user-input textarea {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    min-height: 60px;
+    resize: none;
+    font-family: inherit;
+}
+
+.user-input button {
+    margin-left: 10px;
+    padding: 10px 20px;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.user-input button:hover {
+    background-color: #34495e;
+}
+
+.mcp-config {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.mcp-config h3 {
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.mcp-config textarea {
+    width: 100%;
+    height: 200px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    font-family: monospace;
+    resize: vertical;
+}
+
+/* 配置标签页样式 */
+.config-tabs {
+    display: flex;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.config-tab {
+    padding: 8px 15px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    border-radius: 5px 5px 0 0;
+    margin-right: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.config-tab:hover {
+    background-color: #e9ecef;
+}
+
+.config-tab.active {
+    background-color: #fff;
+    border-bottom: 1px solid #fff;
+    margin-bottom: -1px;
+    font-weight: bold;
+}
+
+.config-panel {
+    display: none;
+}
+
+.config-panel.active {
+    display: block;
+}
+
+.usage-tips {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.usage-tips h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.usage-tips p {
+    margin: 5px 0;
+}
+
+/* 系统消息样式 */
+.system-message {
+    background-color: #f8f9fa;
+    color: #666;
+    border-left: 3px solid #ddd;
+    margin: 10px auto;
+    font-style: italic;
+    max-width: 90%;
+    transition: opacity 0.5s ease-out;
+}
+
+.error-message {
+    background-color: #fff8f8;
+    border-left: 3px solid #e74c3c;
+    color: #e74c3c;
+}
+
+/* 工具调用相关样式 */
+.bot-message em {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.bot-message code {
+    background-color: #f8f9fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 0.9em;
+    color: #e83e8c;
+}
+
+.tool-execution {
+    border-left: 3px solid #28a745;
+    padding-left: 10px;
+    margin: 5px 0;
+    color: #28a745;
+    background-color: rgba(40, 167, 69, 0.05);
+    animation: fadeIn 0.3s ease-in;
+}
+
+.tool-detail-message {
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    max-width: 90%;
+    margin-right: auto;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    animation: slideIn 0.3s ease-out;
+}
+
+.tool-header {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #28a745;
+    cursor: pointer;
+    user-select: none;
+    padding: 8px 10px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.tool-header:hover {
+    background-color: #e9ecef;
+}
+
+.tool-toggle {
+    display: inline-block;
+    width: 16px;
+    transition: transform 0.2s;
+    margin-right: 5px;
+}
+
+.tool-hint {
+    color: #6c757d;
+    font-size: 0.85em;
+    font-weight: normal;
+    margin-left: 5px;
+}
+
+.tool-details {
+    background-color: #fff;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #e9ecef;
+    font-style: normal;
+    max-height: 400px;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out, margin 0.3s ease-in-out, border 0.3s ease-in-out;
+}
+
+.tool-details.collapsed {
+    max-height: 0;
+    padding: 0;
+    border: none;
+    margin: 0;
+    overflow: hidden;
+}
+
+.tool-args,
+.tool-result {
+    margin-bottom: 8px;
+}
+
+.tool-details pre {
+    background-color: #f8f9fa;
+    padding: 8px;
+    border-radius: 4px;
+    margin-top: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    color: #333;
+    font-family: monospace;
+    font-size: 0.9em;
+    border: 1px solid #e9ecef;
+}
+
+.tool-error {
+    border-left: 3px solid #dc3545;
+    padding-left: 10px;
+    margin: 5px 0;
+    font-style: italic;
+    color: #dc3545;
+}
+
+.loading {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.6;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 主容器和标签页样式 */
+.main-container {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.tabs-container {
+    margin-bottom: 15px;
+    flex-shrink: 0;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 15px;
+}
+
+.tab {
+    padding: 10px 20px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    border-radius: 5px 5px 0 0;
+    margin-right: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.tab .material-icons {
+    margin-right: 5px;
+}
+
+.tab:hover {
+    background-color: #e9ecef;
+}
+
+.tab.active {
+    background-color: #fff;
+    border-bottom: 1px solid #fff;
+    margin-bottom: -1px;
+    font-weight: bold;
+    color: #3498db;
+}
+
+.tab-content {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.tab-panel {
+    display: none;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.tab-panel.active {
+    display: flex;
+}
+
+/* 设置页面样式 - 新样式 */
+.settings-container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    width: 100%;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.setting-section {
+    margin-bottom: 30px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.setting-section h3 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.section-icon {
+    margin-right: 8px;
+    color: #3498db;
+}
+
+.setting-item {
+    margin-bottom: 15px;
+}
+
+.setting-item label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* 下拉选择框样式 */
+.select-wrapper {
+    position: relative;
+    display: inline-block;
+    max-width: 400px;
+    width: 100%;
+}
+
+.select-wrapper select {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: inherit;
+    margin-bottom: 5px;
+    background-color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.select-wrapper select:hover,
+.select-wrapper select:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+.select-arrow {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #666;
+}
+
+.setting-hint {
+    margin-top: 8px;
+    color: #6c757d;
+    font-size: 0.9em;
+}
+
+/* Monaco编辑器相关样式 */
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.editor-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+    background-color: #f1f3f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-button:hover {
+    background-color: #e9ecef;
+    border-color: #ccc;
+}
+
+.action-button .material-icons {
+    font-size: 18px;
+    margin-right: 5px;
+}
+
+.json-editor {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    height: 250px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+/* 编辑器加载状态 */
+.editor-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    font-style: italic;
+    animation: pulse 1.5s infinite;
+}
+
+.editor-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: #fff8f8;
+    color: #e74c3c;
+    padding: 15px;
+}
+
+/* 后备编辑器样式 */
+#fallbackJsonEditor {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: none;
+    border: none;
+    outline: none;
+    background-color: #f8f9fa;
+}
+
+#fallbackJsonEditor:focus {
+    background-color: #fff;
+    box-shadow: inset 0 0 0 2px #3498db;
+}
+
+/* 提示样式改进 */
+.setting-hints {
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 15px;
+    border-left: 3px solid #3498db;
+}
+
+.hint-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.hint-item:last-child {
+    margin-bottom: 0;
+}
+
+.hint-icon {
+    color: #3498db;
+    font-size: 18px;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.hint-text {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.hint-text code {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 0.95em;
+    word-break: break-all;
+}
+
+/* 保存设置按钮 */
+.settings-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.primary-button {
+    display: flex;
+    align-items: center;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.primary-button:hover {
+    background-color: #2980b9;
+}
+
+.primary-button .material-icons {
+    margin-right: 8px;
+}
+
+/* 工具使用提示样式 */
+.bot-message em:contains("正在使用工具") {
+    display: inline-block;
+    animation: pulse 1.5s infinite;
+    color: #3498db;
+    background-color: rgba(52, 152, 219, 0.1);
+    padding: 3px 6px;
+    border-radius: 3px;
+}
+
+/* 工具状态消息样式 */
+.tool-status-message {
+    margin: 10px auto;
+    max-width: 90%;
+    background-color: rgba(52, 152, 219, 0.1);
+    border-left: 3px solid #3498db;
+    border-radius: 4px;
+    padding: 10px 15px;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.tool-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #3498db;
+}
+
+.tool-status-text {
+    font-size: 0.9em;
+}
+
+.loading-dots {
+    display: inline-block;
+    position: relative;
+    width: 20px;
+    height: 20px;
+}
+
+.loading-dots:before,
+.loading-dots:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #3498db;
+    animation: loading-dots 1.4s infinite ease-in-out;
+}
+
+.loading-dots:after {
+    animation-delay: 0.7s;
+}
+
+@keyframes loading-dots {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+/* 简单JSON编辑器样式 */
+.simple-json-editor {
+    width: 100%;
+    height: 240px;
+    padding: 12px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    tab-size: 2;
+}
+
+.simple-json-editor:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}

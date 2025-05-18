@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Run MCP with LLM Demo</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- 添加Material Design图标 -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+
+<body>
+  <div class="container">
+    <header class="app-header">
+      <h1>Run MCP with LLM Demo</h1>
+    </header>
+
+    <div class="main-container">
+      <div class="tabs-container">
+        <div class="tabs">
+          <button class="tab active" data-tab="chat">
+            <span class="material-icons">chat</span> 对话
+          </button>
+          <button class="tab" data-tab="settings">
+            <span class="material-icons">settings</span> 设置
+          </button>
+        </div>
+      </div>
+
+      <div class="tab-content">
+        <!-- 对话标签页 -->
+        <div class="tab-panel active" id="chat-panel">
+          <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+              <!-- 消息将在这里显示 -->
+            </div>
+
+            <div class="user-input">
+              <textarea id="userMessage" placeholder="请输入您的问题..."></textarea>
+              <button id="sendButton">
+                <span class="material-icons">send</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 设置标签页 - 重新设计 -->
+        <div class="tab-panel" id="settings-panel">
+          <div class="settings-container">
+            <!-- 模型设置部分 -->
+            <div class="setting-section">
+              <h3><span class="material-icons section-icon">smart_toy</span> 模型设置</h3>
+              <div class="setting-item">
+                <label for="modelSelect">选择模型:</label>
+                <div class="select-wrapper">
+                  <select id="modelSelect">
+                    <option value="doubao-1-5-pro-32k-250115" selected>豆包 - 1.5 Pro 32k</option>
+                    <option value="doubao-1-5-70b">豆包 - 1.5 70B</option>
+                    <option value="doubao-1-8-72b">豆包 - 1.8 72B</option>
+                  </select>
+                  <span class="material-icons select-arrow">arrow_drop_down</span>
+                </div>
+                <p class="setting-hint">选择合适的模型进行对话</p>
+              </div>
+            </div>
+
+            <!-- MCP服务器配置部分 - 重新设计 -->
+            <div class="setting-section">
+              <h3><span class="material-icons section-icon">extension</span> 外部MCP服务器配置</h3>
+              <div class="setting-item">
+                <div class="editor-header">
+                  <label for="mcpConfig">配置JSON:</label>
+                  <div class="editor-actions">
+                    <button id="formatJsonBtn" class="action-button" title="格式化JSON">
+                      <span class="material-icons">code</span> 格式化
+                    </button>
+                    <button id="defaultConfigBtn" class="action-button" title="恢复默认配置">
+                      <span class="material-icons">restore</span> 恢复默认
+                    </button>
+                  </div>
+                </div>
+                <!-- 使用简单的文本区域替换Monaco编辑器 -->
+                <textarea id="simpleJsonEditor" class="simple-json-editor" spellcheck="false">{
+  "mcpServers": {
+    "weather": {
+      "url": "http://127.0.0.1:8000/sse"
+    }
+  }
+}</textarea>
+              </div>
+            </div>
+
+            <!-- 保存设置按钮 -->
+            <div class="settings-actions">
+              <button id="saveSettingsBtn" class="primary-button">
+                <span class="material-icons">save</span> 保存设置
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 隐藏的textarea用于保存monaco编辑器的内容 -->
+  <textarea id="mcpConfig" style="display:none;">{
+  "mcpServers": {
+    "weather": {
+      "url": "http://127.0.0.1:8000/sse"
+    }
+  }
+}</textarea>
+
+  <script src="{{ url_for('static', path='/js/script.js') }}"></script>
+</body>
+
+</html>
